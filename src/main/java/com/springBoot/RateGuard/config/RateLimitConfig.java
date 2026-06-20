@@ -8,8 +8,16 @@ public class RateLimitConfig {
         return 10;
     }
 
-
     public long getWindowSize(){
         return 60000;
+    }
+
+    public double getBucketCapacity(){
+        return 10;
+    }
+
+
+    public double getRefillRate(){
+        return 1;
     }
 }

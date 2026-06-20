@@ -3,6 +3,7 @@ package com.springBoot.RateGuard.limiter;
 import com.springBoot.RateGuard.config.RateLimitConfig;
 import com.springBoot.RateGuard.model.RateLimitEntry;
 import com.springBoot.RateGuard.storage.RateLimitStore;
+import com.springBoot.RateGuard.strategy.RateLimiterType;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,8 +17,14 @@ public class FixedWindowRateLimiter implements RateLimiter {
     }
 
     @Override
+    public RateLimiterType getType(){
+        return RateLimiterType.FIXED_WINDOW;
+    }
+
+    @Override
     public boolean allowRequest(String clientId){
-        RateLimitEntry entry = store.get(clientId);
+        RateLimitEntry entry =
+                (RateLimitEntry) store.get(clientId);
         long currentTime = System.currentTimeMillis();
         if(entry == null){
             store.save(clientId,
