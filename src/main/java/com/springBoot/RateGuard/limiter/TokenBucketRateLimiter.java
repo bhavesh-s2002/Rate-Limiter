@@ -2,6 +2,7 @@ package com.springBoot.RateGuard.limiter;
 
 import com.springBoot.RateGuard.config.RateLimitConfig;
 import com.springBoot.RateGuard.model.TokenBucketEntry;
+import com.springBoot.RateGuard.policy.RateLimitPolicy;
 import com.springBoot.RateGuard.storage.RateLimitStore;
 import com.springBoot.RateGuard.strategy.RateLimiterType;
 import org.springframework.stereotype.Component;
@@ -11,15 +12,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class TokenBucketRateLimiter implements RateLimiter {
     private final RateLimitStore<TokenBucketEntry> store;
-    private final RateLimitConfig config;
 
-    public TokenBucketRateLimiter(RateLimitStore<TokenBucketEntry> store,RateLimitConfig config){
+    public TokenBucketRateLimiter(RateLimitStore<TokenBucketEntry> store){
         this.store = store;
-        this.config=config;
     }
 
     @Override
-    public boolean allowRequest(String clientId) {
+    public boolean allowRequest(String clientId, RateLimitPolicy policy) {
 
         long currentTime = System.currentTimeMillis();
 
@@ -27,7 +26,7 @@ public class TokenBucketRateLimiter implements RateLimiter {
 
         if (bucket == null) {
             bucket = new TokenBucketEntry(
-                    config.getTokenBucket().getCapacity() - 1,
+                    policy.getCapacity()-1,
                     currentTime
             );
 
@@ -38,7 +37,7 @@ public class TokenBucketRateLimiter implements RateLimiter {
             return true;
         }
 
-        refill(bucket, currentTime);
+        refill(bucket, currentTime, policy);
 
         if (bucket.getTokens() >= 1) {
             bucket.consumeToken();
@@ -48,16 +47,16 @@ public class TokenBucketRateLimiter implements RateLimiter {
         return false;
     }
 
-    private void refill(TokenBucketEntry bucket, long currentTime){
+    private void refill(TokenBucketEntry bucket, long currentTime, RateLimitPolicy policy){
 
         long elapsedTime = currentTime - bucket.getLastRefillTime();
 
         double tokensToAdd =
-                (elapsedTime / 1000.0) * config.getTokenBucket().getRefillRate();
+                (elapsedTime / 1000.0) * policy.getRefillRate();
 
         double newTokens =
                 Math.min(
-                        config.getTokenBucket().getCapacity(), bucket.getTokens() + tokensToAdd
+                        policy.getCapacity(), bucket.getTokens() + tokensToAdd
                 );
 
         bucket.addTokens(

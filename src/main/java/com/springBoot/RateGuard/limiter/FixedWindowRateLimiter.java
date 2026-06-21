@@ -2,6 +2,7 @@ package com.springBoot.RateGuard.limiter;
 
 import com.springBoot.RateGuard.config.RateLimitConfig;
 import com.springBoot.RateGuard.model.RateLimitEntry;
+import com.springBoot.RateGuard.policy.RateLimitPolicy;
 import com.springBoot.RateGuard.storage.RateLimitStore;
 import com.springBoot.RateGuard.strategy.RateLimiterType;
 import org.springframework.stereotype.Component;
@@ -10,10 +11,9 @@ import org.springframework.stereotype.Component;
 public class FixedWindowRateLimiter implements RateLimiter {
 
     private final RateLimitStore<RateLimitEntry> store;
-    private final RateLimitConfig config;
 
-    public FixedWindowRateLimiter(RateLimitStore<RateLimitEntry> store, RateLimitConfig config){
-        this.store=store; this.config=config;
+    public FixedWindowRateLimiter(RateLimitStore<RateLimitEntry> store){
+        this.store=store;
     }
 
     @Override
@@ -22,7 +22,8 @@ public class FixedWindowRateLimiter implements RateLimiter {
     }
 
     @Override
-    public boolean allowRequest(String clientId){
+    public boolean allowRequest(String clientId,
+                                RateLimitPolicy policy){
         RateLimitEntry entry = store.get(clientId);
         long currentTime = System.currentTimeMillis();
         if(entry == null){
@@ -31,13 +32,13 @@ public class FixedWindowRateLimiter implements RateLimiter {
             );
             return true;
         }
-        if(currentTime - entry.getWindowStartTime() > config.getFixedWindow().getWindowSize()){
+        if(currentTime - entry.getWindowStartTime() > policy.getWindowSize()){
             store.save(clientId,
                     new RateLimitEntry(1, currentTime)
             );
             return true;
         }
-        if(entry.getRequestCount() < config.getFixedWindow().getMaxRequests()){
+        if(entry.getRequestCount() < policy.getMaxRequests()){
             entry.increment();
             return true;
         }

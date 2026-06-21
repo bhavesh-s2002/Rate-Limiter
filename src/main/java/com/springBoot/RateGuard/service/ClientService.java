@@ -13,14 +13,14 @@ public class ClientService {
             return new Client(
                     clientId,
                     "Premium User",
-                    Plan.PREMIUM.name()
+                    Plan.PREMIUM
             );
         }
 
         return new Client(
                 clientId,
                 "Free User",
-                Plan.FREE.name()
+                Plan.FREE
         );
     }
 }

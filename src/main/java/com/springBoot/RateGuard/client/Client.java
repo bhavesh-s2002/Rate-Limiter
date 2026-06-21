@@ -5,24 +5,23 @@ public class Client {
 
     private String name;
 
-    private String plan;
+    private Plan plan;
 
     public Client(
             String clientId,
             String name,
-            String plan){
+            Plan plan){
 
         this.clientId = clientId;
         this.name = name;
         this.plan = plan;
-
     }
 
     public String getClientId(){
         return clientId;
     }
 
-    public String getPlan(){
+    public Plan getPlan(){
         return plan;
     }
 
