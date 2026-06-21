@@ -6,16 +6,16 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class InMemoryRateLimitStore implements RateLimitStore {
-    private final ConcurrentHashMap<String, Object> store = new ConcurrentHashMap<>();
+public class InMemoryRateLimitStore<T> implements RateLimitStore<T> {
+    private final ConcurrentHashMap<String, T> store = new ConcurrentHashMap<>();
 
     @Override
-    public Object get(String clientId){
+    public T get(String clientId){
         return store.get(clientId);
     }
 
     @Override
-    public void save(String clientId, Object value){
+    public void save(String clientId, T value){
         store.put(clientId, value);
     }
 }

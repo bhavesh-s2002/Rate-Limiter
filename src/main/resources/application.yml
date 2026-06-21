@@ -1,0 +1,13 @@
+rate-limit:
+
+  fixed-window:
+    max-requests: 10
+    window-size: 60000
+
+  token-bucket:
+    capacity: 10
+    refill-rate: 1
+
+  sliding-window:
+    max-requests: 10
+    window-size: 60000

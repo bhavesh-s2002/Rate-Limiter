@@ -10,10 +10,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class TokenBucketRateLimiter implements RateLimiter {
-    private final RateLimitStore store;
+    private final RateLimitStore<TokenBucketEntry> store;
     private final RateLimitConfig config;
 
-    public TokenBucketRateLimiter(RateLimitStore store,RateLimitConfig config){
+    public TokenBucketRateLimiter(RateLimitStore<TokenBucketEntry> store,RateLimitConfig config){
         this.store = store;
         this.config=config;
     }
@@ -23,11 +23,11 @@ public class TokenBucketRateLimiter implements RateLimiter {
 
         long currentTime = System.currentTimeMillis();
 
-        TokenBucketEntry bucket = (TokenBucketEntry) store.get(clientId);
+        TokenBucketEntry bucket = store.get(clientId);
 
         if (bucket == null) {
             bucket = new TokenBucketEntry(
-                    config.getBucketCapacity() - 1,
+                    config.getTokenBucket().getCapacity() - 1,
                     currentTime
             );
 
@@ -53,11 +53,11 @@ public class TokenBucketRateLimiter implements RateLimiter {
         long elapsedTime = currentTime - bucket.getLastRefillTime();
 
         double tokensToAdd =
-                (elapsedTime / 1000.0) * config.getRefillRate();
+                (elapsedTime / 1000.0) * config.getTokenBucket().getRefillRate();
 
         double newTokens =
                 Math.min(
-                        config.getBucketCapacity(), bucket.getTokens() + tokensToAdd
+                        config.getTokenBucket().getCapacity(), bucket.getTokens() + tokensToAdd
                 );
 
         bucket.addTokens(

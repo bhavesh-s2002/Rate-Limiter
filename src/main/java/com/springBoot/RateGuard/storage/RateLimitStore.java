@@ -1,11 +1,8 @@
 package com.springBoot.RateGuard.storage;
 
-import com.springBoot.RateGuard.model.RateLimitEntry;
+public interface RateLimitStore<T> {
+    T get(String clientId);
 
-public interface RateLimitStore {
-    Object get(String clientId);
-
-
-    void save(String clientId, Object value);
+    void save(String clientId, T value);
 
 }

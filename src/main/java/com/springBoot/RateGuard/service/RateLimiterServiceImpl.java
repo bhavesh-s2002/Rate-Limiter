@@ -18,7 +18,7 @@ public class RateLimiterServiceImpl implements RateLimiterService {
     public boolean allowRequest(String clientId){
         RateLimiter limiter=
                 factory.getLimiter(
-                        RateLimiterType.TOKEN_BUCKET
+                        RateLimiterType.SLIDING_WINDOW
                 );
         return limiter.allowRequest(clientId);
     }

@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class FixedWindowRateLimiter implements RateLimiter {
 
-    private final RateLimitStore store;
+    private final RateLimitStore<RateLimitEntry> store;
     private final RateLimitConfig config;
 
-    public FixedWindowRateLimiter(RateLimitStore store, RateLimitConfig config){
+    public FixedWindowRateLimiter(RateLimitStore<RateLimitEntry> store, RateLimitConfig config){
         this.store=store; this.config=config;
     }
 
@@ -23,8 +23,7 @@ public class FixedWindowRateLimiter implements RateLimiter {
 
     @Override
     public boolean allowRequest(String clientId){
-        RateLimitEntry entry =
-                (RateLimitEntry) store.get(clientId);
+        RateLimitEntry entry = store.get(clientId);
         long currentTime = System.currentTimeMillis();
         if(entry == null){
             store.save(clientId,
@@ -32,13 +31,13 @@ public class FixedWindowRateLimiter implements RateLimiter {
             );
             return true;
         }
-        if(currentTime - entry.getWindowStartTime() > config.getWindowSize()){
+        if(currentTime - entry.getWindowStartTime() > config.getFixedWindow().getWindowSize()){
             store.save(clientId,
                     new RateLimitEntry(1, currentTime)
             );
             return true;
         }
-        if(entry.getRequestCount() < config.getMaxRequests()){
+        if(entry.getRequestCount() < config.getFixedWindow().getMaxRequests()){
             entry.increment();
             return true;
         }
