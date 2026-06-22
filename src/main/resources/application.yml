@@ -1,13 +1,18 @@
-rate-limit:
+spring:
 
-  fixed-window:
-    max-requests: 10
-    window-size: 60000
+  datasource:
 
-  token-bucket:
-    capacity: 10
-    refill-rate: 1
+    url: jdbc:postgresql://localhost:5432/rateguard
 
-  sliding-window:
-    max-requests: 10
-    window-size: 60000
+    username: postgres
+
+    password: postgres
+
+
+  jpa:
+
+    hibernate:
+      ddl-auto: update
+
+
+    show-sql: true

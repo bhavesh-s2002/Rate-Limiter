@@ -1,6 +1,5 @@
 package com.springBoot.RateGuard.limiter;
 
-import com.springBoot.RateGuard.config.RateLimitConfig;
 import com.springBoot.RateGuard.model.SlidingWindowEntry;
 import com.springBoot.RateGuard.policy.RateLimitPolicy;
 import com.springBoot.RateGuard.storage.RateLimitStore;

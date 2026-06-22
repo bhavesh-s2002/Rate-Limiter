@@ -21,7 +21,7 @@ public class PolicyService {
 
         return new RateLimitPolicy(
                 RateLimiterType.FIXED_WINDOW,
-                5,
+                10,
                 60000,
                 0,0
         );
