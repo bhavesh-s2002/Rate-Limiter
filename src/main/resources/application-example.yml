@@ -1,0 +1,17 @@
+spring:
+
+  datasource:
+
+    url: jdbc:postgresql://localhost:5432/rateguard
+
+    username: YOUR_USERNAME
+
+    password: YOUR_PASSWORD
+
+
+  jpa:
+
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
