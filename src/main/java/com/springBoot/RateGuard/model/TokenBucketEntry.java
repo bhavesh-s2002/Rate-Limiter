@@ -2,15 +2,15 @@ package com.springBoot.RateGuard.model;
 
 public class TokenBucketEntry {
 
-    private double tokens;
+    private long tokens;
 
     private long lastRefillTime;
 
-    public TokenBucketEntry(double tokens, long lastRefillTime){
+    public TokenBucketEntry(long tokens, long lastRefillTime){
         this.tokens = tokens;
         this.lastRefillTime = lastRefillTime;
     }
-    public double getTokens(){
+    public long getTokens(){
         return tokens;
     }
 
@@ -18,7 +18,7 @@ public class TokenBucketEntry {
         return lastRefillTime;
     }
 
-    public void addTokens(double amount){
+    public void addTokens(long amount){
         tokens += amount;
     }
 

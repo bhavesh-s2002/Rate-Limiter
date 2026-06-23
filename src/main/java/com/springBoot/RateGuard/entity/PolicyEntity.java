@@ -21,9 +21,9 @@ public class PolicyEntity {
 
     private long windowSize;
 
-    private double capacity;
+    private long capacity;
 
-    private double refillRate;
+    private long refillRate;
 
     public PolicyEntity(){
 
@@ -34,8 +34,8 @@ public class PolicyEntity {
             String algorithm,
             int maxRequests,
             long windowSize,
-            double capacity,
-            double refillRate
+            long capacity,
+            long refillRate
     ){
         this.plan = plan;
         this.algorithm = algorithm;
@@ -61,11 +61,11 @@ public class PolicyEntity {
         return windowSize;
     }
 
-    public double getCapacity(){
+    public long getCapacity(){
         return capacity;
     }
 
-    public double getRefillRate(){
+    public long getRefillRate(){
         return refillRate;
     }
 

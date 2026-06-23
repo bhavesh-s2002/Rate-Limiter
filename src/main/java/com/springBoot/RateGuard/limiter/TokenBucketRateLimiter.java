@@ -1,8 +1,10 @@
 package com.springBoot.RateGuard.limiter;
 
+import com.springBoot.RateGuard.model.RateLimitResult;
 import com.springBoot.RateGuard.model.TokenBucketEntry;
 import com.springBoot.RateGuard.policy.RateLimitPolicy;
 import com.springBoot.RateGuard.storage.RateLimitStore;
+import com.springBoot.RateGuard.storage.TokenBucketStore;
 import com.springBoot.RateGuard.strategy.RateLimiterType;
 import org.springframework.stereotype.Component;
 
@@ -10,19 +12,25 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class TokenBucketRateLimiter implements RateLimiter {
-    private final RateLimitStore<TokenBucketEntry> store;
+    private final TokenBucketStore store;
 
-    public TokenBucketRateLimiter(RateLimitStore<TokenBucketEntry> store){
+    public TokenBucketRateLimiter(TokenBucketStore store){
         this.store = store;
     }
 
     @Override
-    public boolean allowRequest(String clientId, RateLimitPolicy policy) {
+    public RateLimitResult allowRequest(String clientId, RateLimitPolicy policy) {
 
         long currentTime = System.currentTimeMillis();
 
         TokenBucketEntry bucket = store.get(clientId);
-
+        System.out.println(
+                "Client = " + clientId
+        );
+        System.out.println(
+                "Tokens before = " +
+                        (bucket == null ? "null" : bucket.getTokens())
+        );
         if (bucket == null) {
             bucket = new TokenBucketEntry(
                     policy.getCapacity()-1,
@@ -33,27 +41,43 @@ public class TokenBucketRateLimiter implements RateLimiter {
                     clientId, bucket
             );
 
-            return true;
+            return new RateLimitResult(
+                    true,
+                    policy.getCapacity(),
+                    (long) bucket.getTokens()
+            );
         }
 
         refill(bucket, currentTime, policy);
 
         if (bucket.getTokens() >= 1) {
             bucket.consumeToken();
-            return true;
+            store.save(clientId,bucket);
+            System.out.println(
+                    "Tokens after = " + bucket.getTokens()
+            );
+            return new RateLimitResult(
+                    true,
+                    policy.getCapacity(),
+                    (long) bucket.getTokens()
+            );
         }
 
-        return false;
+        return new RateLimitResult(
+                false,
+                policy.getCapacity(),
+                0
+        );
     }
 
     private void refill(TokenBucketEntry bucket, long currentTime, RateLimitPolicy policy){
 
         long elapsedTime = currentTime - bucket.getLastRefillTime();
 
-        double tokensToAdd =
-                (elapsedTime / 1000.0) * policy.getRefillRate();
+        long tokensToAdd =
+                (elapsedTime / 1000) * policy.getRefillRate();
 
-        double newTokens =
+        long newTokens =
                 Math.min(
                         policy.getCapacity(), bucket.getTokens() + tokensToAdd
                 );

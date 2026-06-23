@@ -1,6 +1,8 @@
 package com.springBoot.RateGuard.service;
 
+import com.springBoot.RateGuard.model.RateLimitResult;
+
 public interface RateLimiterService {
 
-    boolean allowRequest(String clientId);
+    RateLimitResult allowRequest(String clientId);
 }

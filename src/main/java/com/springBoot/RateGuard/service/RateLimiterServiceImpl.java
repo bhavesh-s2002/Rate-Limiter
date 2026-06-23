@@ -1,10 +1,11 @@
 package com.springBoot.RateGuard.service;
 
 import com.springBoot.RateGuard.client.Client;
+import com.springBoot.RateGuard.exception.RateLimitExceededException;
 import com.springBoot.RateGuard.factory.RateLimiterFactory;
 import com.springBoot.RateGuard.limiter.RateLimiter;
+import com.springBoot.RateGuard.model.RateLimitResult;
 import com.springBoot.RateGuard.policy.RateLimitPolicy;
-import com.springBoot.RateGuard.strategy.RateLimiterType;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,7 +26,7 @@ public class RateLimiterServiceImpl implements RateLimiterService {
     }
 
     @Override
-    public boolean allowRequest(String clientId){
+    public RateLimitResult allowRequest(String clientId){
         Client client =
                 clientService.getClient(clientId);
 
@@ -33,11 +34,25 @@ public class RateLimiterServiceImpl implements RateLimiterService {
                 policyService.getPolicy(
                         client.getPlan()
                 );
+        System.out.println(
+                "Selected algorithm = "
+                        + policy.getType()
+        );
 
         RateLimiter limiter=
                 factory.getLimiter(
                         policy.getType()
                 );
-        return limiter.allowRequest(clientId,policy);
+        RateLimitResult result =
+                limiter.allowRequest(
+                        clientId,
+                        policy
+                );
+        if(!result.isAllowed()){
+            throw new RateLimitExceededException(
+                    "Rate limit exceeded. Try again later."
+            );
+        }
+        return result;
     }
 }

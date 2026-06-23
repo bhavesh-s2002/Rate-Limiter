@@ -1,21 +1,23 @@
 package com.springBoot.RateGuard.limiter;
 
+import com.springBoot.RateGuard.model.RateLimitResult;
 import com.springBoot.RateGuard.model.SlidingWindowEntry;
 import com.springBoot.RateGuard.policy.RateLimitPolicy;
 import com.springBoot.RateGuard.storage.RateLimitStore;
+import com.springBoot.RateGuard.storage.SlidingWindowStore;
 import com.springBoot.RateGuard.strategy.RateLimiterType;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SlidingWindowRateLimiter implements RateLimiter {
-    private final RateLimitStore<SlidingWindowEntry> store;
+    private final SlidingWindowStore store;
 
-    public SlidingWindowRateLimiter(RateLimitStore<SlidingWindowEntry> store){
+    public SlidingWindowRateLimiter(SlidingWindowStore store){
         this.store = store;
     }
 
     @Override
-    public boolean allowRequest(String clientId, RateLimitPolicy policy) {
+    public RateLimitResult allowRequest(String clientId, RateLimitPolicy policy) {
 
         long currentTime = System.currentTimeMillis();
 
@@ -30,7 +32,11 @@ public class SlidingWindowRateLimiter implements RateLimiter {
                             currentTime
                     )
             );
-            return true;
+            return new RateLimitResult(
+                    true,
+                    policy.getMaxRequests(),
+                    0
+            );
         }
         long elapsed = currentTime - entry.getWindowStartTime();
 
@@ -47,12 +53,20 @@ public class SlidingWindowRateLimiter implements RateLimiter {
                 + entry.getCurrentCount();
 
         if (estimatedCount >= policy.getMaxRequests()) {
-            return false;
+            return new RateLimitResult(
+                    false,
+                    policy.getMaxRequests(),
+                    0
+            );
         }
         entry.incrementCurrent();
 
         store.save(clientId, entry);
-        return true;
+        return new RateLimitResult(
+                true,
+                policy.getMaxRequests(),
+                0
+        );
     }
 
     @Override

@@ -10,16 +10,16 @@ public class RateLimitPolicy {
 
     private long windowSize;
 
-    private double capacity;
+    private long capacity;
 
-    private double refillRate;
+    private long refillRate;
 
     public RateLimitPolicy(
             RateLimiterType type,
             int maxRequests,
             long windowSize,
-            double capacity,
-            double refillRate
+            long capacity,
+            long refillRate
     ){
         this.type = type;
         this.maxRequests = maxRequests;
@@ -40,11 +40,11 @@ public class RateLimitPolicy {
         return windowSize;
     }
 
-    public double getCapacity(){
+    public long getCapacity(){
         return capacity;
     }
 
-    public double getRefillRate(){
+    public long getRefillRate(){
         return refillRate;
     }
 

@@ -24,8 +24,6 @@ public class ClientEntity {
     public ClientEntity(){
 
     }
-
-
     public ClientEntity(
             String clientId,
             String name,
@@ -38,6 +36,10 @@ public class ClientEntity {
 
     public String getClientId(){
         return clientId;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getPlan(){

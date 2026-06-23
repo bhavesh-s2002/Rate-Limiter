@@ -1,7 +1,9 @@
 package com.springBoot.RateGuard.filter;
 
+import com.springBoot.RateGuard.model.RateLimitResult;
 import com.springBoot.RateGuard.service.RateLimiterService;
 import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 
@@ -19,12 +21,34 @@ public class RateLimitFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        String clientId = request.getRemoteAddr();
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        boolean allowed = rateLimiterService.allowRequest(clientId);
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        if (!allowed) {
-            HttpServletResponse httpResponse = (HttpServletResponse) response;
+        String clientId =
+                httpRequest.getHeader("X-CLIENT-ID");
+
+        RateLimitResult result =
+                rateLimiterService.allowRequest(clientId);
+
+
+        httpResponse.setHeader(
+                "X-RateLimit-Limit",
+                String.valueOf(
+                        result.getLimit()
+                )
+        );
+
+
+        httpResponse.setHeader(
+                "X-RateLimit-Remaining",
+                String.valueOf(
+                        result.getRemaining()
+                )
+        );
+
+
+        if (!result.isAllowed()) {
             httpResponse.setStatus(429);
 
             httpResponse.getWriter().write(
