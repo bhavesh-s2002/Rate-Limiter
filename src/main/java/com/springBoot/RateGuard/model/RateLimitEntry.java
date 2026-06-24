@@ -1,6 +1,10 @@
 package com.springBoot.RateGuard.model;
 
-public class RateLimitEntry {
+import java.io.Serializable;
+
+public class RateLimitEntry implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int requestCount;
 
     private long windowStartTime;

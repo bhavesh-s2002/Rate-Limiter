@@ -3,18 +3,15 @@ package com.springBoot.RateGuard.limiter;
 import com.springBoot.RateGuard.model.RateLimitResult;
 import com.springBoot.RateGuard.model.TokenBucketEntry;
 import com.springBoot.RateGuard.policy.RateLimitPolicy;
-import com.springBoot.RateGuard.storage.RateLimitStore;
-import com.springBoot.RateGuard.storage.TokenBucketStore;
+import com.springBoot.RateGuard.storage.RedisTokenBucketStore;
 import com.springBoot.RateGuard.strategy.RateLimiterType;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 @Component
 public class TokenBucketRateLimiter implements RateLimiter {
-    private final TokenBucketStore store;
+    private final RedisTokenBucketStore store;
 
-    public TokenBucketRateLimiter(TokenBucketStore store){
+    public TokenBucketRateLimiter(RedisTokenBucketStore store){
         this.store = store;
     }
 

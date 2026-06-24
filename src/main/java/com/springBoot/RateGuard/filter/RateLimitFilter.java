@@ -50,10 +50,19 @@ public class RateLimitFilter implements Filter {
 
         if (!result.isAllowed()) {
             httpResponse.setStatus(429);
-
-            httpResponse.getWriter().write(
-                    "Too many requests. Try later."
+            httpResponse.setContentType(
+                    "application/json"
             );
+
+            String responseBody =
+                    "{"
+                            + "\"message\":\"Rate limit exceeded\","
+                            + "\"limit\":" + result.getLimit() + ","
+                            + "\"remaining\":" + result.getRemaining()
+                            + "}";
+
+            httpResponse.getWriter()
+                    .write(responseBody);
 
             return;
         }

@@ -1,7 +1,10 @@
 package com.springBoot.RateGuard.model;
 
-public class TokenBucketEntry {
+import java.io.Serializable;
 
+public class TokenBucketEntry implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     private long tokens;
 
     private long lastRefillTime;

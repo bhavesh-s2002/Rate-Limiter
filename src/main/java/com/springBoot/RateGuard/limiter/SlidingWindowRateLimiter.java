@@ -3,16 +3,15 @@ package com.springBoot.RateGuard.limiter;
 import com.springBoot.RateGuard.model.RateLimitResult;
 import com.springBoot.RateGuard.model.SlidingWindowEntry;
 import com.springBoot.RateGuard.policy.RateLimitPolicy;
-import com.springBoot.RateGuard.storage.RateLimitStore;
-import com.springBoot.RateGuard.storage.SlidingWindowStore;
+import com.springBoot.RateGuard.storage.RedisSlidingWindowStore;
 import com.springBoot.RateGuard.strategy.RateLimiterType;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SlidingWindowRateLimiter implements RateLimiter {
-    private final SlidingWindowStore store;
+    private final RedisSlidingWindowStore store;
 
-    public SlidingWindowRateLimiter(SlidingWindowStore store){
+    public SlidingWindowRateLimiter(RedisSlidingWindowStore store){
         this.store = store;
     }
 
